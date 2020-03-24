@@ -26,6 +26,7 @@ class LRUCache:
 
     def get(self, key):
         if key in self.storage:
+            # find the key in the DLL and move to the front
             node = self.storage[key]
             self.order.move_to_front(node)
             return node.value[1]
@@ -43,7 +44,7 @@ class LRUCache:
     the newly-specified value.
     """
 
-   def set(self, key, value):
+    def set(self, key, value):
 
         # check to see if the key is currently in storage
         if key in self.storage:
