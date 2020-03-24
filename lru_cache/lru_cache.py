@@ -25,9 +25,12 @@ class LRUCache:
     """
 
     def get(self, key):
-        if ket in self.storage:
+        if key in self.storage:
             node = self.storage[key]
-            self.order.move_to_front(front)
+            self.order.move_to_front(node)
+            return node.value[1]
+        else:
+            return None
 
     """
     Adds the given key-value pair to the cache. The newly-
@@ -40,5 +43,24 @@ class LRUCache:
     the newly-specified value.
     """
 
-    def set(self, key, value):
-        pass
+   def set(self, key, value):
+
+        # check to see if the key is currently in storage
+        if key in self.storage:
+            node = self.storage[key]
+            node.value = (key, value)
+            # move key to the front if the key is in the storage
+            self.order.move_to_front(node)
+            return
+
+        # check to see if the cache is full
+        if self.size == self.limit:
+            # if cache is full, delete the oldest in the cache -> dictionary and list
+            del self.storage[self.order.tail.value[0]]
+            self.order.remove_from_tail()
+            self.size -= 1
+
+        # add new pair to the list and dictionary
+        self.order.add_to_head((key, value))
+        self.storage[key] = self.order.head
+        self.size += 1
