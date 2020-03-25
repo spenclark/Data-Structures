@@ -25,13 +25,12 @@ class LRUCache:
     """
 
     def get(self, key):
-        if key in self.storage:
-            # find the key in the DLL and move to the front
-            node = self.storage[key]
-            self.order.move_to_front(node)
-            return node.value[1]
-        else:
+        if key not in self.storage:
             return None
+        else:
+            node = self.storage[key]
+            self.order.move_to_end(node)
+            return node.value[1]
 
     """
     Adds the given key-value pair to the cache. The newly-
@@ -46,22 +45,15 @@ class LRUCache:
 
     def set(self, key, value):
 
-        # check to see if the key is currently in storage
         if key in self.storage:
             node = self.storage[key]
             node.value = (key, value)
-            # move key to the front if the key is in the storage
-            self.order.move_to_front(node)
+            self.order.move_to_end(node)
             return
+        if len(self.order) == self.limit:
+            index_of_oldest = self.order.head.value[0]
+            del self.storage[index_of_oldest]
+            self.order.remove_from_head()
 
-        # check to see if the cache is full
-        if self.size == self.limit:
-            # if cache is full, delete the oldest in the cache -> dictionary and list
-            del self.storage[self.order.tail.value[0]]
-            self.order.remove_from_tail()
-            self.size -= 1
-
-        # add new pair to the list and dictionary
-        self.order.add_to_head((key, value))
-        self.storage[key] = self.order.head
-        self.size += 1
+        self.order.add_to_tail((key, value))
+        self.storage[key] = self.order.tail
